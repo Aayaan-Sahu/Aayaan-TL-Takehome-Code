@@ -4,18 +4,13 @@ import {
   type PaginatedSubmissions,
   type SubmissionStatus,
 } from "../api/submissions";
+import { PrimaryButton } from "./Buttons";
+import { StatusPill } from "./StatusPill";
+import { submissionStatusLabels } from "./statusPillConfig";
 
 const PAGE_SIZE = 10;
 
-const statusLabels: Record<SubmissionStatus, string> = {
-  draft: "Draft",
-  submitted: "Submitted",
-  under_review: "Under Review",
-  accepted: "Accepted",
-  rejected: "Rejected",
-};
-
-const statuses = Object.keys(statusLabels) as SubmissionStatus[];
+const statuses = Object.keys(submissionStatusLabels) as SubmissionStatus[];
 
 function formatDate(value: string) {
   return new Date(value).toLocaleDateString(undefined, {
@@ -102,7 +97,7 @@ export function SubmissionsTable() {
             <option value="">All statuses</option>
             {statuses.map((statusValue) => (
               <option key={statusValue} value={statusValue}>
-                {statusLabels[statusValue]}
+                {submissionStatusLabels[statusValue]}
               </option>
             ))}
           </select>
@@ -158,11 +153,16 @@ export function SubmissionsTable() {
                 <tr key={submission.id}>
                   <td>{submission.title}</td>
                   <td>{submission.doi_suffix}</td>
-                  <td>{statusLabels[submission.status]}</td>
+                  <td>
+                    <StatusPill type={submission.status} />
+                  </td>
                   <td>{formatDate(submission.created_at)}</td>
                   <td>{formatDate(submission.updated_at)}</td>
                   <td>
-                    <a href={`/submissions/${submission.id}/edit`}>Edit</a>
+                    <PrimaryButton
+                      href={`/submissions/${submission.id}/edit`}
+                      text="Edit"
+                    />
                   </td>
                 </tr>
               ))}

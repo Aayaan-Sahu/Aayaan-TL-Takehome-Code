@@ -8,6 +8,7 @@ import {
   type SubmissionPayload,
   type SubmissionStatus,
 } from '../api/submissions'
+import { CancelButton, PrimaryButton } from './Buttons'
 
 type FormAuthor = {
   name: string
@@ -289,21 +290,18 @@ function SubmissionForm({ initialSubmission }: SubmissionFormProps) {
           <a className="secondary-button" href="/submissions">
             Cancel
           </a>
-          <button
+          <CancelButton
             type="button"
             disabled={submittingStatus !== null}
             onClick={() => saveSubmission('draft')}
-          >
-            {submittingStatus === 'draft' ? 'Saving...' : 'Save Draft'}
-          </button>
-          <button
-            className="primary-button"
+            text={submittingStatus === 'draft' ? 'Saving...' : 'Save Draft'}
+          />
+          <PrimaryButton
             type="button"
             disabled={submittingStatus !== null}
             onClick={() => saveSubmission('submitted')}
-          >
-            {submittingStatus === 'submitted' ? 'Submitting...' : 'Submit'}
-          </button>
+            text={submittingStatus === 'submitted' ? 'Submitting...' : 'Submit'}
+          />
         </div>
       </div>
     </section>

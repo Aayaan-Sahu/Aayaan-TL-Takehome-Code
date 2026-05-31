@@ -1,22 +1,26 @@
+@import "tailwindcss";
+
 :root {
-  font: 16px/1.5 system-ui, sans-serif;
-  color: #24292f;
-  background: #ffffff;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    font:
+        16px/1.5 system-ui,
+        sans-serif;
+    color: #24292f;
+    background: #ffffff;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 #root {
-  min-height: 100svh;
+    min-height: 100svh;
 }
 
 body {
-  margin: 0;
+    margin: 0;
 }
 
 h1 {
-  font-size: 32px;
-  margin: 0;
+    font-size: 32px;
+    margin: 0;
 }
