@@ -1,4 +1,5 @@
-import type { ComponentType, ReactNode } from 'react'
+import type { ComponentType } from 'react'
+import { Navigate, Outlet, Route, Routes, useParams } from 'react-router-dom'
 import { FormsPage } from './components/FormsPage'
 import { ManuscriptsPage } from './components/ManuscriptsPage'
 import { MyProfilePage } from './components/MyProfilePage'
@@ -17,16 +18,11 @@ const dummyPages: Record<string, ComponentType> = {
   '/my-profile': MyProfilePage,
 }
 
-function getEditSubmissionId(pathname: string) {
-  const match = pathname.match(/^\/submissions\/(\d+)\/edit$/)
-  return match ? Number(match[1]) : null
-}
-
-function AppShell({ children, pathname }: { children: ReactNode; pathname: string }) {
+function AppShell() {
   return (
     <div className="min-h-screen bg-[#f8f8f9] pl-[232px] text-[#323232]">
-      <Sidebar pathname={pathname} />
-      {children}
+      <Sidebar />
+      <Outlet />
     </div>
   )
 }
@@ -43,49 +39,42 @@ function SubmissionsDashboard() {
   )
 }
 
-function App() {
-  const pathname = window.location.pathname
-  const editSubmissionId = getEditSubmissionId(pathname)
-  const DummyPage = dummyPages[pathname]
+function SubmissionEditRoute() {
+  const { submissionId } = useParams()
+  const parsedId = Number(submissionId)
 
-  if (pathname === '/' || pathname === '/dashboard' || pathname === '/submissions') {
-    return (
-      <AppShell pathname={pathname}>
-        <SubmissionsDashboard />
-      </AppShell>
-    )
+  if (!Number.isInteger(parsedId)) {
+    return <NotFoundPage />
   }
 
-  if (pathname === '/submissions/new') {
-    return (
-      <AppShell pathname={pathname}>
-        <SubmissionCreatePage />
-      </AppShell>
-    )
-  }
+  return <SubmissionEditPage submissionId={parsedId} />
+}
 
-  if (editSubmissionId !== null) {
-    return (
-      <AppShell pathname={pathname}>
-        <SubmissionEditPage submissionId={editSubmissionId} />
-      </AppShell>
-    )
-  }
-
-  if (DummyPage) {
-    return (
-      <AppShell pathname={pathname}>
-        <DummyPage />
-      </AppShell>
-    )
-  }
-
+function NotFoundPage() {
   return (
-    <AppShell pathname={pathname}>
-      <main className="min-h-screen px-5 py-6">
-        <h1 className="text-3xl font-bold text-[#39AE2A]">Page not found</h1>
-      </main>
-    </AppShell>
+    <main className="min-h-screen px-5 py-6">
+      <h1 className="text-3xl font-bold text-[#39AE2A]">Page not found</h1>
+    </main>
+  )
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route element={<AppShell />}>
+        <Route index element={<Navigate to="/dashboard" replace />} />
+        <Route path="dashboard" element={<SubmissionsDashboard />} />
+        <Route path="submissions" element={<SubmissionsDashboard />} />
+        <Route path="submissions/new" element={<SubmissionCreatePage />} />
+        <Route path="submissions/:submissionId/edit" element={<SubmissionEditRoute />} />
+
+        {Object.entries(dummyPages).map(([path, Page]) => (
+          <Route key={path} path={path.slice(1)} element={<Page />} />
+        ))}
+
+        <Route path="*" element={<NotFoundPage />} />
+      </Route>
+    </Routes>
   )
 }
 

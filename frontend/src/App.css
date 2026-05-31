@@ -60,6 +60,7 @@ button:disabled {
   align-items: center;
   border-radius: 6px;
   box-sizing: border-box;
+  cursor: pointer;
   display: inline-flex;
   font-family: Roboto, sans-serif;
   font-size: 16px;
@@ -71,6 +72,10 @@ button:disabled {
   padding: 0 16px;
   text-align: center;
   text-decoration: none;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease;
   width: 151px;
 }
 
@@ -80,10 +85,20 @@ button:disabled {
   color: #ffffff;
 }
 
+.app-button--primary:not(:disabled):hover {
+  background: #2f9324;
+}
+
 .app-button--cancel {
   background: #ffffff;
   border: 1px solid #9b9b9b;
   color: #6c6c6c;
+}
+
+.app-button--cancel:not(:disabled):hover {
+  background: #f8f8f9;
+  border-color: #6c6c6c;
+  color: #323232;
 }
 
 .app-button:disabled {
@@ -256,10 +271,16 @@ table {
   line-height: normal;
   padding: 0 16px;
   text-decoration: none;
+  transition: background-color 120ms ease;
 }
 
 .submissions-new-link {
   font-weight: 600;
+}
+
+.submissions-new-link:hover,
+.submissions-edit-link:hover {
+  background: #2f9324;
 }
 
 .submissions-card {
@@ -319,6 +340,28 @@ table {
 
 .submissions-table {
   font-family: Roboto, sans-serif;
+  table-layout: fixed;
+}
+
+.submissions-column-manuscript {
+  width: 15%;
+}
+
+.submissions-column-title {
+  width: 25%;
+}
+
+.submissions-column-status {
+  width: 16%;
+}
+
+.submissions-column-created,
+.submissions-column-updated {
+  width: 15%;
+}
+
+.submissions-column-actions {
+  width: 14%;
 }
 
 .submissions-table thead {
@@ -332,6 +375,7 @@ table {
   font-weight: 400;
   line-height: 1.15;
   padding: 14px 24px;
+  text-align: left;
   text-transform: uppercase;
 }
 
@@ -341,12 +385,26 @@ table {
   font-size: 16px;
   line-height: 22px;
   padding: 34px 24px;
+  overflow: hidden;
+  text-overflow: ellipsis;
   vertical-align: middle;
 }
 
 .submissions-table td:nth-child(2) {
   font-weight: 500;
-  max-width: 320px;
+}
+
+.submissions-table th:nth-child(6),
+.submissions-table td:nth-child(6) {
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.submissions-table th:nth-child(1),
+.submissions-table td:nth-child(1),
+.submissions-table th:nth-child(2),
+.submissions-table td:nth-child(2) {
+  overflow-wrap: anywhere;
 }
 
 .submissions-status-filter {
@@ -450,8 +508,8 @@ td {
   border-radius: 5px;
   box-shadow: 0 0 8px rgb(0 0 0 / 25%);
   box-sizing: border-box;
-  max-width: 1020px;
   min-height: 793px;
+  width: 100%;
 }
 
 .form-header {
@@ -516,8 +574,9 @@ td {
 }
 
 .form-field textarea {
-  min-height: 100px;
-  resize: vertical;
+  min-height: 180px;
+  overflow: hidden;
+  resize: none;
 }
 
 .author-section {

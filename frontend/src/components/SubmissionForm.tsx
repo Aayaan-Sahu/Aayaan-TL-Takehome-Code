@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   createSubmission,
   getSubmission,
@@ -129,12 +130,22 @@ type SubmissionFormProps = {
 }
 
 function SubmissionForm({ initialSubmission }: SubmissionFormProps) {
+  const navigate = useNavigate()
+  const abstractRef = useRef<HTMLTextAreaElement | null>(null)
   const [form, setForm] = useState<FormState>(() =>
     initialSubmission ? makeFormFromSubmission(initialSubmission) : makeEmptyForm(),
   )
   const [errors, setErrors] = useState<FormErrors>({ authorErrors: form.authors.map(() => ({})) })
   const [submitError, setSubmitError] = useState('')
   const [submittingStatus, setSubmittingStatus] = useState<SubmissionStatus | null>(null)
+
+  useLayoutEffect(() => {
+    const textarea = abstractRef.current
+    if (!textarea) return
+
+    textarea.style.height = 'auto'
+    textarea.style.height = `${textarea.scrollHeight}px`
+  }, [form.abstract])
 
   function updateField(field: keyof Omit<FormState, 'authors'>, value: string) {
     setForm((current) => ({ ...current, [field]: value }))
@@ -181,7 +192,7 @@ function SubmissionForm({ initialSubmission }: SubmissionFormProps) {
       } else {
         await createSubmission(payload)
       }
-      window.location.href = '/submissions'
+      navigate('/submissions')
     } catch {
       setSubmitError('Unable to save submission.')
     } finally {
@@ -276,6 +287,7 @@ function SubmissionForm({ initialSubmission }: SubmissionFormProps) {
           <label className="form-field">
             Abstract
             <textarea
+              ref={abstractRef}
               value={form.abstract}
               onChange={(event) => updateField('abstract', event.target.value)}
               aria-invalid={Boolean(errors.abstract)}

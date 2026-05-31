@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { NavLink, useLocation } from 'react-router-dom'
 
 type NavItem = {
   label: string
@@ -68,7 +69,9 @@ function NavIcon({ children }: { children: ReactNode }) {
   )
 }
 
-export function Sidebar({ pathname }: { pathname: string }) {
+export function Sidebar() {
+  const { pathname } = useLocation()
+
   return (
     <aside className="sidebar">
       <div className="sidebar-profile">
@@ -99,14 +102,14 @@ export function Sidebar({ pathname }: { pathname: string }) {
               (pathname === '/' || pathname === '/submissions' || pathname.startsWith('/submissions')))
 
           return (
-            <a
+            <NavLink
               className={`sidebar-nav-link${isActive ? ' is-active' : ''}`}
-              href={item.href}
+              to={item.href}
               key={item.href}
             >
               <NavIcon>{item.icon}</NavIcon>
               {item.label}
-            </a>
+            </NavLink>
           )
         })}
       </nav>

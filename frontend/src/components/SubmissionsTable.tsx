@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   getSubmissions,
   type PaginatedSubmissions,
@@ -70,7 +71,9 @@ export function SubmissionsTable() {
     setPage(1);
   }
 
-  const hasSubmissions = Boolean(data && data.items.length > 0);
+  const submissions = data?.items ?? [];
+  const hasSubmissions = submissions.length > 0;
+  const isInitialLoading = isLoading && data === null;
 
   return (
     <section className="submissions">
@@ -105,9 +108,9 @@ export function SubmissionsTable() {
           </svg>
         </button>
 
-        <a className="submissions-new-link" href="/submissions/new">
+        <Link className="submissions-new-link" to="/submissions/new">
           + New submission
-        </a>
+        </Link>
       </div>
 
       <div className="submissions-card">
@@ -126,7 +129,15 @@ export function SubmissionsTable() {
           </button>
         </div>
 
-        <table className="submissions-table">
+        <table className="submissions-table" aria-busy={isLoading}>
+          <colgroup>
+            <col className="submissions-column-manuscript" />
+            <col className="submissions-column-title" />
+            <col className="submissions-column-status" />
+            <col className="submissions-column-created" />
+            <col className="submissions-column-updated" />
+            <col className="submissions-column-actions" />
+          </colgroup>
           <thead>
             <tr>
               <th>
@@ -160,7 +171,7 @@ export function SubmissionsTable() {
             </tr>
           </thead>
           <tbody>
-            {isLoading && (
+            {isInitialLoading && (
               <tr>
                 <td className="submissions-message-cell" colSpan={6}>
                   Loading submissions...
@@ -184,9 +195,8 @@ export function SubmissionsTable() {
               </tr>
             )}
 
-            {!isLoading &&
-              !error &&
-              data?.items.map((submission) => (
+            {!error &&
+              submissions.map((submission) => (
                 <tr key={submission.id}>
                   <td>{submission.manuscript_number}</td>
                   <td>{submission.title}</td>
@@ -196,12 +206,12 @@ export function SubmissionsTable() {
                   <td>{formatDate(submission.created_at)}</td>
                   <td>{formatDate(submission.updated_at)}</td>
                   <td>
-                    <a
+                    <Link
                       className="submissions-edit-link"
-                      href={`/submissions/${submission.id}/edit`}
+                      to={`/submissions/${submission.id}/edit`}
                     >
                       Edit
-                    </a>
+                    </Link>
                   </td>
                 </tr>
               ))}
