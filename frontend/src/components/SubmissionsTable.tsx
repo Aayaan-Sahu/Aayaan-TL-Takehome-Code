@@ -116,17 +116,6 @@ export function SubmissionsTable() {
       <div className="submissions-card">
         <div className="submissions-card-header">
           <h2>Your Submissions</h2>
-          <button type="button" aria-label="Collapse submissions">
-            <svg aria-hidden="true" fill="none" viewBox="0 0 24 24">
-              <path
-                d="m8 10 4 4 4-4"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-              />
-            </svg>
-          </button>
         </div>
 
         <table className="submissions-table" aria-busy={isLoading}>

@@ -10,6 +10,7 @@ import {
   type SubmissionStatus,
 } from '../api/submissions'
 import { CancelButton, PrimaryButton } from './Buttons'
+import { submissionStatusLabels } from './statusPillConfig'
 
 type FormAuthor = {
   name: string
@@ -21,6 +22,7 @@ type FormState = {
   doiSuffix: string
   abstract: string
   manuscriptNumber: string
+  status: SubmissionStatus
   authors: FormAuthor[]
 }
 
@@ -40,6 +42,7 @@ type FormErrors = {
 const blankAuthor = { name: '', email: '' }
 const doiPattern = /^[A-Za-z0-9._/-]+$/
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const statuses = Object.keys(submissionStatusLabels) as SubmissionStatus[]
 
 function makeEmptyForm(): FormState {
   return {
@@ -47,6 +50,7 @@ function makeEmptyForm(): FormState {
     doiSuffix: '',
     abstract: '',
     manuscriptNumber: `MS-${Date.now()}`,
+    status: 'draft',
     authors: [{ ...blankAuthor }],
   }
 }
@@ -57,6 +61,7 @@ function makeFormFromSubmission(submission: Submission): FormState {
     doiSuffix: submission.doi_suffix,
     abstract: submission.abstract,
     manuscriptNumber: submission.manuscript_number,
+    status: submission.status,
     authors: submission.authors.map((author) => ({
       name: author.name,
       email: author.email ?? '',
@@ -111,13 +116,13 @@ function validateForm(form: FormState): FormErrors {
   return errors
 }
 
-function buildPayload(form: FormState, status: SubmissionStatus): SubmissionPayload {
+function buildPayload(form: FormState): SubmissionPayload {
   return {
     title: form.title.trim(),
     manuscript_number: form.manuscriptNumber,
     doi_suffix: form.doiSuffix.trim(),
     abstract: form.abstract.trim(),
-    status,
+    status: form.status,
     authors: form.authors.map<AuthorInput>((author) => ({
       name: author.name.trim(),
       email: author.email.trim() || null,
@@ -137,7 +142,7 @@ function SubmissionForm({ initialSubmission }: SubmissionFormProps) {
   )
   const [errors, setErrors] = useState<FormErrors>({ authorErrors: form.authors.map(() => ({})) })
   const [submitError, setSubmitError] = useState('')
-  const [submittingStatus, setSubmittingStatus] = useState<SubmissionStatus | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   useLayoutEffect(() => {
     const textarea = abstractRef.current
@@ -147,7 +152,10 @@ function SubmissionForm({ initialSubmission }: SubmissionFormProps) {
     textarea.style.height = `${textarea.scrollHeight}px`
   }, [form.abstract])
 
-  function updateField(field: keyof Omit<FormState, 'authors'>, value: string) {
+  function updateField<Field extends keyof Omit<FormState, 'authors'>>(
+    field: Field,
+    value: FormState[Field],
+  ) {
     setForm((current) => ({ ...current, [field]: value }))
   }
 
@@ -177,16 +185,16 @@ function SubmissionForm({ initialSubmission }: SubmissionFormProps) {
     })
   }
 
-  async function saveSubmission(status: SubmissionStatus) {
+  async function saveSubmission() {
     const nextErrors = validateForm(form)
     setErrors(nextErrors)
     setSubmitError('')
 
     if (hasErrors(nextErrors)) return
 
-    setSubmittingStatus(status)
+    setIsSubmitting(true)
     try {
-      const payload = buildPayload(form, status)
+      const payload = buildPayload(form)
       if (initialSubmission) {
         await updateSubmission(initialSubmission.id, payload)
       } else {
@@ -196,7 +204,7 @@ function SubmissionForm({ initialSubmission }: SubmissionFormProps) {
     } catch {
       setSubmitError('Unable to save submission.')
     } finally {
-      setSubmittingStatus(null)
+      setIsSubmitting(false)
     }
   }
 
@@ -285,6 +293,20 @@ function SubmissionForm({ initialSubmission }: SubmissionFormProps) {
           </label>
 
           <label className="form-field">
+            Status
+            <select
+              value={form.status}
+              onChange={(event) => updateField('status', event.target.value as SubmissionStatus)}
+            >
+              {statuses.map((status) => (
+                <option key={status} value={status}>
+                  {submissionStatusLabels[status]}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="form-field">
             Abstract
             <textarea
               ref={abstractRef}
@@ -300,15 +322,21 @@ function SubmissionForm({ initialSubmission }: SubmissionFormProps) {
         <div className="form-actions">
           <CancelButton
             type="button"
-            disabled={submittingStatus !== null}
-            onClick={() => saveSubmission('draft')}
-            text={submittingStatus === 'draft' ? 'Saving...' : 'Save Draft'}
+            disabled={isSubmitting}
+            onClick={() => navigate('/submissions')}
+            text="Cancel"
           />
           <PrimaryButton
             type="button"
-            disabled={submittingStatus !== null}
-            onClick={() => saveSubmission('submitted')}
-            text={submittingStatus === 'submitted' ? 'Submitting...' : 'Submit'}
+            disabled={isSubmitting}
+            onClick={saveSubmission}
+            text={
+              isSubmitting
+                ? 'Saving...'
+                : initialSubmission
+                  ? 'Save Changes'
+                  : 'Create Submission'
+            }
           />
         </div>
       </div>
