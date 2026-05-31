@@ -24,7 +24,7 @@ function getEditSubmissionId(pathname: string) {
 
 function AppShell({ children, pathname }: { children: ReactNode; pathname: string }) {
   return (
-    <div className="min-h-screen bg-[#f7f7f7] pl-40 text-[#323232]">
+    <div className="min-h-screen bg-[#f8f8f9] pl-[232px] text-[#323232]">
       <Sidebar pathname={pathname} />
       {children}
     </div>
@@ -34,14 +34,8 @@ function AppShell({ children, pathname }: { children: ReactNode; pathname: strin
 function SubmissionsDashboard() {
   return (
     <main className="min-h-screen px-5 py-6">
-      <header className="mb-12 flex items-center justify-between gap-4">
+      <header className="mb-0 flex items-center justify-between gap-4">
         <h1 className="text-3xl font-bold text-[#39AE2A]">Dashboard</h1>
-        <a
-          className="rounded-md bg-[#39AE2A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#347554]"
-          href="/submissions/new"
-        >
-          + New submission
-        </a>
       </header>
 
       <SubmissionsTable />

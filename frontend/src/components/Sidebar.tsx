@@ -55,7 +55,7 @@ function NavIcon({ children }: { children: ReactNode }) {
   return (
     <svg
       aria-hidden="true"
-      className="h-3.5 w-3.5 shrink-0"
+      className="sidebar-nav-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -70,28 +70,28 @@ function NavIcon({ children }: { children: ReactNode }) {
 
 export function Sidebar({ pathname }: { pathname: string }) {
   return (
-    <aside className="fixed inset-y-0 left-0 z-10 flex w-40 flex-col bg-[#39AE2A] px-5 py-5 text-white">
-      <div className="mb-7 flex items-center gap-3">
-        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-[#39AE2A]">
+    <aside className="sidebar">
+      <div className="sidebar-profile">
+        <div className="sidebar-avatar">
           <svg
             aria-hidden="true"
-            className="h-5 w-5"
+            className="sidebar-avatar-icon"
             fill="currentColor"
             viewBox="0 0 24 24"
           >
             <path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm-8 9a8 8 0 1 1 16 0H4Z" />
           </svg>
         </div>
-        <div className="min-w-0">
-          <p className="truncate text-xs font-semibold leading-tight">Max Bacon</p>
-          <p className="flex items-center gap-1 text-xs leading-tight">
-            <span className="h-2 w-2 rounded-full border border-white bg-red-600" />
+        <div className="sidebar-profile-text">
+          <p>Max Bacon</p>
+          <p className="sidebar-status">
+            <span />
             Offline
           </p>
         </div>
       </div>
 
-      <nav className="grid gap-2 text-xs font-medium">
+      <nav className="sidebar-nav">
         {navItems.map((item) => {
           const isActive =
             pathname === item.href ||
@@ -100,9 +100,7 @@ export function Sidebar({ pathname }: { pathname: string }) {
 
           return (
             <a
-              className={`flex items-center gap-2 rounded-md px-1 py-1.5 ${
-                isActive ? 'bg-white/15' : 'hover:bg-white/10'
-              }`}
+              className={`sidebar-nav-link${isActive ? ' is-active' : ''}`}
               href={item.href}
               key={item.href}
             >

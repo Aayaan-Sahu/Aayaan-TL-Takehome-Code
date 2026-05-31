@@ -135,7 +135,6 @@ function SubmissionForm({ initialSubmission }: SubmissionFormProps) {
   const [errors, setErrors] = useState<FormErrors>({ authorErrors: form.authors.map(() => ({})) })
   const [submitError, setSubmitError] = useState('')
   const [submittingStatus, setSubmittingStatus] = useState<SubmissionStatus | null>(null)
-  const isEditing = Boolean(initialSubmission)
 
   function updateField(field: keyof Omit<FormState, 'authors'>, value: string) {
     setForm((current) => ({ ...current, [field]: value }))
@@ -194,7 +193,7 @@ function SubmissionForm({ initialSubmission }: SubmissionFormProps) {
     <section className="form-shell">
       <div className="form-card">
         <div className="form-header">
-          <h1>{isEditing ? 'Edit Submission' : 'Research Object Submission Form'}</h1>
+          <h1>Research Object Submission Form</h1>
           <p>Please fill out the form below to complete your submission.</p>
         </div>
 
@@ -205,7 +204,7 @@ function SubmissionForm({ initialSubmission }: SubmissionFormProps) {
             </p>
           )}
 
-          <label>
+          <label className="form-field">
             Title
             <input
               value={form.title}
@@ -221,7 +220,7 @@ function SubmissionForm({ initialSubmission }: SubmissionFormProps) {
 
             {form.authors.map((author, index) => (
               <div className="author-row" key={index}>
-                <label>
+                <label className="form-field">
                   Author name
                   <input
                     value={author.name}
@@ -233,7 +232,7 @@ function SubmissionForm({ initialSubmission }: SubmissionFormProps) {
                   )}
                 </label>
 
-                <label>
+                <label className="form-field">
                   Email address
                   <input
                     type="email"
@@ -264,7 +263,7 @@ function SubmissionForm({ initialSubmission }: SubmissionFormProps) {
             </button>
           </div>
 
-          <label>
+          <label className="form-field">
             DOI
             <input
               value={form.doiSuffix}
@@ -274,7 +273,7 @@ function SubmissionForm({ initialSubmission }: SubmissionFormProps) {
             {errors.doiSuffix && <span className="field-error">{errors.doiSuffix}</span>}
           </label>
 
-          <label>
+          <label className="form-field">
             Abstract
             <textarea
               value={form.abstract}
@@ -287,9 +286,6 @@ function SubmissionForm({ initialSubmission }: SubmissionFormProps) {
         </div>
 
         <div className="form-actions">
-          <a className="secondary-button" href="/submissions">
-            Cancel
-          </a>
           <CancelButton
             type="button"
             disabled={submittingStatus !== null}

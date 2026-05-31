@@ -4,27 +4,30 @@ import {
   type PaginatedSubmissions,
   type SubmissionStatus,
 } from "../api/submissions";
-import { PrimaryButton } from "./Buttons";
 import { StatusPill } from "./StatusPill";
 import { submissionStatusLabels } from "./statusPillConfig";
 
 const PAGE_SIZE = 10;
 
 const statuses = Object.keys(submissionStatusLabels) as SubmissionStatus[];
+const dateFormatter = new Intl.DateTimeFormat(undefined, {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+  hour: "numeric",
+  minute: "2-digit",
+});
 
 function formatDate(value: string) {
-  return new Date(value).toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
+  return dateFormatter
+    .format(new Date(value))
+    .replace(/\bAM\b/g, "am")
+    .replace(/\bPM\b/g, "pm");
 }
 
 export function SubmissionsTable() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<SubmissionStatus | "">("");
-  const [dateFrom, setDateFrom] = useState("");
-  const [dateTo, setDateTo] = useState("");
   const [page, setPage] = useState(1);
   const [data, setData] = useState<PaginatedSubmissions | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -42,8 +45,6 @@ export function SubmissionsTable() {
           {
             search: search.trim(),
             status,
-            dateFrom,
-            dateTo,
             page,
             pageSize: PAGE_SIZE,
           },
@@ -63,17 +64,19 @@ export function SubmissionsTable() {
     loadSubmissions();
 
     return () => controller.abort();
-  }, [dateFrom, dateTo, page, search, status]);
+  }, [page, search, status]);
 
   function resetPage() {
     setPage(1);
   }
 
+  const hasSubmissions = Boolean(data && data.items.length > 0);
+
   return (
     <section className="submissions">
-      <div className="filters">
-        <label>
-          Search title
+      <div className="submissions-toolbar">
+        <label className="submissions-search">
+          <span className="sr-only">Search submissions</span>
           <input
             type="search"
             value={search}
@@ -81,94 +84,131 @@ export function SubmissionsTable() {
               setSearch(event.target.value);
               resetPage();
             }}
-            placeholder="Search submissions"
+            placeholder="Search"
           />
         </label>
 
-        <label>
-          Status
-          <select
-            value={status}
-            onChange={(event) => {
-              setStatus(event.target.value as SubmissionStatus | "");
-              resetPage();
-            }}
-          >
-            <option value="">All statuses</option>
-            {statuses.map((statusValue) => (
-              <option key={statusValue} value={statusValue}>
-                {submissionStatusLabels[statusValue]}
-              </option>
-            ))}
-          </select>
-        </label>
+        <button
+          className="submissions-search-button"
+          type="button"
+          aria-label="Search submissions"
+          onClick={resetPage}
+        >
+          <svg aria-hidden="true" fill="none" viewBox="0 0 24 24">
+            <path
+              d="m20 20-4.2-4.2m1.2-5.3a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+            />
+          </svg>
+        </button>
 
-        <label>
-          Updated from
-          <input
-            type="date"
-            value={dateFrom}
-            onChange={(event) => {
-              setDateFrom(event.target.value);
-              resetPage();
-            }}
-          />
-        </label>
-
-        <label>
-          Updated to
-          <input
-            type="date"
-            value={dateTo}
-            onChange={(event) => {
-              setDateTo(event.target.value);
-              resetPage();
-            }}
-          />
-        </label>
+        <a className="submissions-new-link" href="/submissions/new">
+          + New submission
+        </a>
       </div>
 
-      {isLoading && <p>Loading submissions...</p>}
-      {error && <p role="alert">{error}</p>}
+      <div className="submissions-card">
+        <div className="submissions-card-header">
+          <h2>Your Submissions</h2>
+          <button type="button" aria-label="Collapse submissions">
+            <svg aria-hidden="true" fill="none" viewBox="0 0 24 24">
+              <path
+                d="m8 10 4 4 4-4"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+              />
+            </svg>
+          </button>
+        </div>
 
-      {!isLoading && !error && data?.items.length === 0 && (
-        <p>No submissions found.</p>
-      )}
-
-      {!isLoading && !error && data !== null && data.items.length > 0 && (
-        <>
-          <table>
-            <thead>
+        <table className="submissions-table">
+          <thead>
+            <tr>
+              <th>
+                MANUSCRIPT
+                <br />
+                NUMBER
+              </th>
+              <th>Title</th>
+              <th>
+                <label className="submissions-status-filter">
+                  <span>Status</span>
+                  <select
+                    value={status}
+                    onChange={(event) => {
+                      setStatus(event.target.value as SubmissionStatus | "");
+                      resetPage();
+                    }}
+                  >
+                    <option value="">All</option>
+                    {statuses.map((statusValue) => (
+                      <option key={statusValue} value={statusValue}>
+                        {submissionStatusLabels[statusValue]}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </th>
+              <th>Created</th>
+              <th>Updated</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {isLoading && (
               <tr>
-                <th>Title</th>
-                <th>DOI suffix</th>
-                <th>Status</th>
-                <th>Created date</th>
-                <th>Updated date</th>
-                <th>Edit</th>
+                <td className="submissions-message-cell" colSpan={6}>
+                  Loading submissions...
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {data.items.map((submission) => (
+            )}
+
+            {!isLoading && error && (
+              <tr>
+                <td className="submissions-message-cell" colSpan={6} role="alert">
+                  {error}
+                </td>
+              </tr>
+            )}
+
+            {!isLoading && !error && !hasSubmissions && (
+              <tr>
+                <td className="submissions-message-cell" colSpan={6}>
+                  No submissions found.
+                </td>
+              </tr>
+            )}
+
+            {!isLoading &&
+              !error &&
+              data?.items.map((submission) => (
                 <tr key={submission.id}>
+                  <td>{submission.manuscript_number}</td>
                   <td>{submission.title}</td>
-                  <td>{submission.doi_suffix}</td>
                   <td>
                     <StatusPill type={submission.status} />
                   </td>
                   <td>{formatDate(submission.created_at)}</td>
                   <td>{formatDate(submission.updated_at)}</td>
                   <td>
-                    <PrimaryButton
+                    <a
+                      className="submissions-edit-link"
                       href={`/submissions/${submission.id}/edit`}
-                      text="Edit"
-                    />
+                    >
+                      Edit
+                    </a>
                   </td>
                 </tr>
               ))}
-            </tbody>
-          </table>
+          </tbody>
+        </table>
 
+        {!isLoading && !error && hasSubmissions && data !== null && (
           <div className="pagination">
             <button
               type="button"
@@ -188,8 +228,8 @@ export function SubmissionsTable() {
               Next
             </button>
           </div>
-        </>
-      )}
+        )}
+      </div>
     </section>
   );
 }
