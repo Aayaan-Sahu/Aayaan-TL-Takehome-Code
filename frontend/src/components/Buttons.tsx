@@ -15,7 +15,13 @@ type BaseButtonProps = AppButtonProps & {
 
 function BaseButton(props: BaseButtonProps) {
   const { text, variant, className = "" } = props;
-  const classes = `app-button app-button--${variant} ${className}`.trim();
+  const baseClasses =
+    "box-border inline-flex h-[35px] w-auto min-w-[151px] items-center justify-center rounded-md px-4 text-center font-[Roboto,sans-serif] text-base font-medium leading-normal tracking-[0.16px] no-underline transition-colors duration-[120ms] ease-in-out disabled:cursor-not-allowed disabled:opacity-70";
+  const variantClasses =
+    variant === "primary"
+      ? "border-0 bg-[#39ae2a] text-white hover:bg-[#2f9324] disabled:hover:bg-[#39ae2a]"
+      : "border border-[#9b9b9b] bg-white text-[#6c6c6c] hover:border-[#6c6c6c] hover:bg-[#f8f8f9] hover:text-[#323232] disabled:hover:border-[#9b9b9b] disabled:hover:bg-white disabled:hover:text-[#6c6c6c]";
+  const classes = `${baseClasses} ${variantClasses} ${className}`.trim();
 
   if ("href" in props && props.href) {
     return (

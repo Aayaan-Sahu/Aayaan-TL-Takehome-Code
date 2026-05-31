@@ -8,7 +8,6 @@ import { Sidebar } from './components/Sidebar'
 import { SubmissionsTable } from './components/SubmissionsTable'
 import { SubmissionCreatePage, SubmissionEditPage } from './components/SubmissionForm'
 import { UsersPage } from './components/UsersPage'
-import './App.css'
 
 const dummyPages: Record<string, ComponentType> = {
   '/forms': FormsPage,

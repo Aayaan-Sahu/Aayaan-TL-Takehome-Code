@@ -11,6 +11,16 @@ import { submissionStatusLabels } from "./statusPillConfig";
 const PAGE_SIZE = 10;
 
 const statuses = Object.keys(submissionStatusLabels) as SubmissionStatus[];
+const toolbarButtonClasses =
+  "inline-flex h-[35px] items-center justify-center rounded-[5px] border-0 bg-[#39ae2a] px-4 font-[Roboto,sans-serif] text-xs leading-normal text-white no-underline transition-colors duration-[120ms] hover:bg-[#2f9324]";
+const tableHeadingClasses =
+  "border-b border-[#dedede] px-6 py-3.5 text-left text-xs font-normal uppercase leading-[1.15] text-black";
+const tableCellClasses =
+  "overflow-hidden text-ellipsis border-b border-[#dedede] px-6 py-[34px] align-middle text-base leading-[22px] text-black";
+const messageCellClasses =
+  "border-b border-[#dedede] px-8 py-[34px] text-left text-base font-normal italic text-[#6c6c6c]";
+const paginationButtonClasses =
+  "rounded-md border border-[#d0d7de] bg-[#f6f8fa] px-3 py-2 text-[#24292f] transition-colors duration-[120ms] enabled:hover:border-[#8c959f] enabled:hover:bg-[#eef1f4] disabled:text-[#8c959f]";
 const dateFormatter = new Intl.DateTimeFormat(undefined, {
   year: "numeric",
   month: "long",
@@ -76,11 +86,12 @@ export function SubmissionsTable() {
   const isInitialLoading = isLoading && data === null;
 
   return (
-    <section className="submissions">
-      <div className="submissions-toolbar">
-        <label className="submissions-search">
+    <section className="mt-[-36px] max-[720px]:mt-0">
+      <div className="mb-[30px] flex items-center justify-end gap-2 max-[720px]:flex-col max-[720px]:items-stretch">
+        <label className="block">
           <span className="sr-only">Search submissions</span>
           <input
+            className="box-border h-[35px] w-[369px] rounded-[5px] border border-[#39ae2a] bg-white px-3 font-[Roboto,sans-serif] text-xs shadow-[0_1px_4px_rgb(0_0_0_/_20%)] max-[720px]:w-full"
             type="search"
             value={search}
             onChange={(event) => {
@@ -92,12 +103,12 @@ export function SubmissionsTable() {
         </label>
 
         <button
-          className="submissions-search-button"
+          className="inline-flex h-[35px] w-[35px] items-center justify-center rounded-full border-0 bg-[#39ae2a] p-0 text-white max-[720px]:w-full max-[720px]:rounded-[5px]"
           type="button"
           aria-label="Search submissions"
           onClick={resetPage}
         >
-          <svg aria-hidden="true" fill="none" viewBox="0 0 24 24">
+          <svg className="h-[17px] w-[17px]" aria-hidden="true" fill="none" viewBox="0 0 24 24">
             <path
               d="m20 20-4.2-4.2m1.2-5.3a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z"
               stroke="currentColor"
@@ -108,37 +119,45 @@ export function SubmissionsTable() {
           </svg>
         </button>
 
-        <Link className="submissions-new-link" to="/submissions/new">
+        <Link className={`${toolbarButtonClasses} font-semibold max-[720px]:w-full`} to="/submissions/new">
           + New submission
         </Link>
       </div>
 
-      <div className="submissions-card">
-        <div className="submissions-card-header">
-          <h2>Your Submissions</h2>
+      <div className="overflow-hidden rounded border border-[#dedede] bg-white shadow-[0_1px_4px_rgb(0_0_0_/_12%)] max-[720px]:overflow-x-auto">
+        <div className="flex h-[95px] items-center justify-between border-b border-[#dedede] px-8 max-[720px]:h-[72px] max-[720px]:px-[18px]">
+          <h2 className="m-0 font-[Roboto,sans-serif] text-base font-bold text-black">Your Submissions</h2>
         </div>
 
-        <table className="submissions-table" aria-busy={isLoading}>
+        <table
+          className="w-full table-fixed border-collapse font-[Roboto,sans-serif] max-[720px]:min-w-[940px]"
+          aria-busy={isLoading}
+        >
           <colgroup>
-            <col className="submissions-column-manuscript" />
-            <col className="submissions-column-title" />
-            <col className="submissions-column-status" />
-            <col className="submissions-column-created" />
-            <col className="submissions-column-updated" />
-            <col className="submissions-column-actions" />
+            <col className="w-[15%]" />
+            <col className="w-[25%]" />
+            <col className="w-[16%]" />
+            <col className="w-[15%]" />
+            <col className="w-[15%]" />
+            <col className="w-[14%]" />
           </colgroup>
-          <thead>
+          <thead className="bg-[#f8f8f9]">
             <tr>
-              <th>
+              <th className={`${tableHeadingClasses} [overflow-wrap:anywhere]`}>
                 MANUSCRIPT
                 <br />
                 NUMBER
               </th>
-              <th>Title</th>
-              <th>
-                <label className="submissions-status-filter">
-                  <span>Status</span>
+              <th className={`${tableHeadingClasses} [overflow-wrap:anywhere]`}>Title</th>
+              <th className={tableHeadingClasses}>
+                <label className="relative inline-flex h-[35px] w-28 cursor-pointer items-center justify-between rounded-md border border-[#dedede] bg-[#f8f8f9] py-0 pl-2.5 pr-9 font-[Roboto,sans-serif] text-[#323232] shadow-[inset_0_0_4px_rgb(0_0_0_/_25%)] focus-within:border-[#39ae2a] focus-within:shadow-[inset_0_0_4px_rgb(0_0_0_/_25%),0_0_0_2px_rgb(57_174_42_/_18%)]">
+                  <span className="text-xs font-normal uppercase leading-none tracking-[0.12px] text-[#323232]">
+                    Status
+                  </span>
+                  <span className="pointer-events-none absolute right-[35px] top-[7px] h-5 w-px bg-[#9b9b9b]" />
+                  <span className="pointer-events-none absolute right-[13px] top-3 h-[7px] w-[7px] rotate-45 border-b-[1.5px] border-r-[1.5px] border-[#6c6c6c]" />
                   <select
+                    className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
                     value={status}
                     onChange={(event) => {
                       setStatus(event.target.value as SubmissionStatus | "");
@@ -154,15 +173,15 @@ export function SubmissionsTable() {
                   </select>
                 </label>
               </th>
-              <th>Created</th>
-              <th>Updated</th>
-              <th>Actions</th>
+              <th className={tableHeadingClasses}>Created</th>
+              <th className={tableHeadingClasses}>Updated</th>
+              <th className={`${tableHeadingClasses} overflow-visible text-clip`}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {isInitialLoading && (
               <tr>
-                <td className="submissions-message-cell" colSpan={6}>
+                <td className={messageCellClasses} colSpan={6}>
                   Loading submissions...
                 </td>
               </tr>
@@ -170,7 +189,7 @@ export function SubmissionsTable() {
 
             {!isLoading && error && (
               <tr>
-                <td className="submissions-message-cell" colSpan={6} role="alert">
+                <td className={messageCellClasses} colSpan={6} role="alert">
                   {error}
                 </td>
               </tr>
@@ -178,7 +197,7 @@ export function SubmissionsTable() {
 
             {!isLoading && !error && !hasSubmissions && (
               <tr>
-                <td className="submissions-message-cell" colSpan={6}>
+                <td className={messageCellClasses} colSpan={6}>
                   No submissions found.
                 </td>
               </tr>
@@ -187,16 +206,20 @@ export function SubmissionsTable() {
             {!error &&
               submissions.map((submission) => (
                 <tr key={submission.id}>
-                  <td>{submission.manuscript_number}</td>
-                  <td>{submission.title}</td>
-                  <td>
+                  <td className={`${tableCellClasses} [overflow-wrap:anywhere]`}>
+                    {submission.manuscript_number}
+                  </td>
+                  <td className={`${tableCellClasses} font-medium [overflow-wrap:anywhere]`}>
+                    {submission.title}
+                  </td>
+                  <td className={tableCellClasses}>
                     <StatusPill type={submission.status} />
                   </td>
-                  <td>{formatDate(submission.created_at)}</td>
-                  <td>{formatDate(submission.updated_at)}</td>
-                  <td>
+                  <td className={tableCellClasses}>{formatDate(submission.created_at)}</td>
+                  <td className={tableCellClasses}>{formatDate(submission.updated_at)}</td>
+                  <td className={`${tableCellClasses} overflow-visible text-clip`}>
                     <Link
-                      className="submissions-edit-link"
+                      className={`${toolbarButtonClasses} h-7 min-w-[140px] uppercase`}
                       to={`/submissions/${submission.id}/edit`}
                     >
                       Edit
@@ -208,8 +231,9 @@ export function SubmissionsTable() {
         </table>
 
         {!isLoading && !error && hasSubmissions && data !== null && (
-          <div className="pagination">
+          <div className="mt-4 flex items-center justify-end gap-3 px-6 py-[18px] font-[Roboto,sans-serif]">
             <button
+              className={paginationButtonClasses}
               type="button"
               disabled={page <= 1}
               onClick={() => setPage((currentPage) => currentPage - 1)}
@@ -220,6 +244,7 @@ export function SubmissionsTable() {
               Page {data.page} of {Math.max(data.total_pages, 1)}
             </span>
             <button
+              className={paginationButtonClasses}
               type="button"
               disabled={data.total_pages === 0 || page >= data.total_pages}
               onClick={() => setPage((currentPage) => currentPage + 1)}

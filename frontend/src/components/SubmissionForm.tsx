@@ -43,6 +43,11 @@ const blankAuthor = { name: '', email: '' }
 const doiPattern = /^[A-Za-z0-9._/-]+$/
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const statuses = Object.keys(submissionStatusLabels) as SubmissionStatus[]
+const formFieldClasses =
+  'grid gap-1 font-[Roboto,sans-serif] text-base font-medium leading-normal tracking-[0.16px] text-[#323232]'
+const formControlClasses =
+  'box-border w-full rounded-[5px] border border-[#dedede] bg-[#f8f8f9] px-2.5 py-[11px] font-[Roboto,sans-serif] text-base font-normal leading-[22px] tracking-[0.16px] text-black shadow-[inset_0_0_4px_rgb(0_0_0_/_25%)]'
+const fieldErrorClasses = 'text-sm text-[#b42318]'
 
 function makeEmptyForm(): FormState {
   return {
@@ -209,64 +214,76 @@ function SubmissionForm({ initialSubmission }: SubmissionFormProps) {
   }
 
   return (
-    <section className="form-shell">
-      <div className="form-card">
-        <div className="form-header">
-          <h1>Research Object Submission Form</h1>
-          <p>Please fill out the form below to complete your submission.</p>
+    <section className="box-border min-h-svh bg-[#f8f8f9] px-[30px] pb-16 pt-[107px]">
+      <div className="box-border min-h-[793px] w-full rounded-[5px] border-0 bg-white shadow-[0_0_8px_rgb(0_0_0_/_25%)]">
+        <div className="border-b border-[#dedede] px-[17px] pb-[27px] pt-[26px]">
+          <h1 className="mb-1 font-[Roboto,sans-serif] text-[30px] font-bold leading-normal text-black">
+            Research Object Submission Form
+          </h1>
+          <p className="m-0 font-[Roboto,sans-serif] text-base leading-[22px] tracking-[0.16px] text-black">
+            Please fill out the form below to complete your submission.
+          </p>
         </div>
 
-        <div className="form-body">
+        <div className="grid gap-6 px-[17px] pt-[33px]">
           {submitError && (
-            <p className="error-message" role="alert">
+            <p className="text-[#b42318]" role="alert">
               {submitError}
             </p>
           )}
 
-          <label className="form-field">
+          <label className={formFieldClasses}>
             Title
             <input
+              className={`${formControlClasses} h-[45px]`}
               value={form.title}
               onChange={(event) => updateField('title', event.target.value)}
               aria-invalid={Boolean(errors.title)}
             />
-            {errors.title && <span className="field-error">{errors.title}</span>}
+            {errors.title && <span className={fieldErrorClasses}>{errors.title}</span>}
           </label>
 
-          <div className="author-section">
-            <h2>Add Co-Authors</h2>
-            {errors.authors && <span className="field-error">{errors.authors}</span>}
+          <div className="grid gap-2">
+            <h2 className="m-0 font-[Roboto,sans-serif] text-base font-semibold leading-normal tracking-[0.16px] text-[#323232]">
+              Add Co-Authors
+            </h2>
+            {errors.authors && <span className={fieldErrorClasses}>{errors.authors}</span>}
 
             {form.authors.map((author, index) => (
-              <div className="author-row" key={index}>
-                <label className="form-field">
+              <div
+                className="grid grid-cols-[208px_208px_auto] items-end gap-[18px] max-[720px]:grid-cols-1"
+                key={index}
+              >
+                <label className={formFieldClasses}>
                   Author name
                   <input
+                    className={`${formControlClasses} h-[45px]`}
                     value={author.name}
                     onChange={(event) => updateAuthor(index, 'name', event.target.value)}
                     aria-invalid={Boolean(errors.authorErrors[index]?.name)}
                   />
                   {errors.authorErrors[index]?.name && (
-                    <span className="field-error">{errors.authorErrors[index].name}</span>
+                    <span className={fieldErrorClasses}>{errors.authorErrors[index].name}</span>
                   )}
                 </label>
 
-                <label className="form-field">
+                <label className={formFieldClasses}>
                   Email address
                   <input
+                    className={`${formControlClasses} h-[45px]`}
                     type="email"
                     value={author.email}
                     onChange={(event) => updateAuthor(index, 'email', event.target.value)}
                     aria-invalid={Boolean(errors.authorErrors[index]?.email)}
                   />
                   {errors.authorErrors[index]?.email && (
-                    <span className="field-error">{errors.authorErrors[index].email}</span>
+                    <span className={fieldErrorClasses}>{errors.authorErrors[index].email}</span>
                   )}
                 </label>
 
                 {form.authors.length > 1 && (
                   <button
-                    className="remove-author"
+                    className="h-[30px] w-[30px] rounded-full border-0 bg-[#39ae2a] p-0 font-[Roboto,sans-serif] text-base leading-none text-white"
                     type="button"
                     onClick={() => removeAuthor(index)}
                     aria-label={`Remove author ${index + 1}`}
@@ -277,24 +294,30 @@ function SubmissionForm({ initialSubmission }: SubmissionFormProps) {
               </div>
             ))}
 
-            <button className="link-button" type="button" onClick={addAuthor}>
+            <button
+              className="justify-self-start border-0 bg-transparent p-0 font-[Roboto,sans-serif] text-base font-semibold leading-normal tracking-[0.16px] text-[#39ae2a] underline"
+              type="button"
+              onClick={addAuthor}
+            >
               Add another person
             </button>
           </div>
 
-          <label className="form-field">
+          <label className={formFieldClasses}>
             DOI
             <input
+              className={`${formControlClasses} h-[45px]`}
               value={form.doiSuffix}
               onChange={(event) => updateField('doiSuffix', event.target.value)}
               aria-invalid={Boolean(errors.doiSuffix)}
             />
-            {errors.doiSuffix && <span className="field-error">{errors.doiSuffix}</span>}
+            {errors.doiSuffix && <span className={fieldErrorClasses}>{errors.doiSuffix}</span>}
           </label>
 
-          <label className="form-field">
+          <label className={formFieldClasses}>
             Status
             <select
+              className={`${formControlClasses} h-[45px]`}
               value={form.status}
               onChange={(event) => updateField('status', event.target.value as SubmissionStatus)}
             >
@@ -306,20 +329,23 @@ function SubmissionForm({ initialSubmission }: SubmissionFormProps) {
             </select>
           </label>
 
-          <label className="form-field">
+          <label className={formFieldClasses}>
             Abstract
             <textarea
+              className={`${formControlClasses} min-h-[180px] resize-none overflow-hidden`}
               ref={abstractRef}
               value={form.abstract}
               onChange={(event) => updateField('abstract', event.target.value)}
               aria-invalid={Boolean(errors.abstract)}
             />
-            {errors.abstract && <span className="field-error">{errors.abstract}</span>}
-            <span className="field-help">Please provide a short summary of your submission</span>
+            {errors.abstract && <span className={fieldErrorClasses}>{errors.abstract}</span>}
+            <span className="font-[Roboto,sans-serif] text-base font-normal italic leading-[22px] tracking-[0.16px] text-[#6e7781]">
+              Please provide a short summary of your submission
+            </span>
           </label>
         </div>
 
-        <div className="form-actions">
+        <div className="flex justify-end gap-[25px] px-[17px] pb-9 pt-[34px] max-[720px]:flex-wrap">
           <CancelButton
             type="button"
             disabled={isSubmitting}

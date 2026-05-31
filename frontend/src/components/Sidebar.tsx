@@ -56,7 +56,7 @@ function NavIcon({ children }: { children: ReactNode }) {
   return (
     <svg
       aria-hidden="true"
-      className="sidebar-nav-icon"
+      className="h-[18.4px] w-[22.8px] flex-none"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -71,30 +71,32 @@ function NavIcon({ children }: { children: ReactNode }) {
 
 export function Sidebar() {
   const { pathname } = useLocation()
+  const navLinkClasses =
+    'box-border flex h-[35px] w-[213px] items-center gap-4 rounded-md px-2.5 text-base font-medium leading-normal text-white no-underline hover:bg-white/12'
 
   return (
-    <aside className="sidebar">
-      <div className="sidebar-profile">
-        <div className="sidebar-avatar">
+    <aside className="fixed inset-y-0 left-0 z-10 box-border w-[232px] bg-[#39ae2a] px-[13px] pt-[22px] font-[Roboto,sans-serif] text-white">
+      <div className="ml-2 flex items-center gap-3.5">
+        <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-[#e8e8e8] text-white">
           <svg
             aria-hidden="true"
-            className="sidebar-avatar-icon"
+            className="h-[35px] w-[35px]"
             fill="currentColor"
             viewBox="0 0 24 24"
           >
             <path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm-8 9a8 8 0 1 1 16 0H4Z" />
           </svg>
         </div>
-        <div className="sidebar-profile-text">
-          <p>Max Bacon</p>
-          <p className="sidebar-status">
-            <span />
+        <div className="min-w-0">
+          <p className="m-0 text-base font-medium leading-normal">Max Bacon</p>
+          <p className="m-0 flex items-center gap-1 text-base font-medium leading-normal">
+            <span className="box-border inline-block h-3 w-3 rounded-full border-2 border-white bg-[#b91c1c]" />
             Offline
           </p>
         </div>
       </div>
 
-      <nav className="sidebar-nav">
+      <nav className="mt-[21px] grid gap-1">
         {navItems.map((item) => {
           const isActive =
             pathname === item.href ||
@@ -103,7 +105,7 @@ export function Sidebar() {
 
           return (
             <NavLink
-              className={`sidebar-nav-link${isActive ? ' is-active' : ''}`}
+              className={`${navLinkClasses} ${isActive ? 'bg-white/12' : ''}`}
               to={item.href}
               key={item.href}
             >
