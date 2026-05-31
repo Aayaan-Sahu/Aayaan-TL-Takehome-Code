@@ -11,6 +11,11 @@ export type Author = {
   email: string | null
 }
 
+export type AuthorInput = {
+  name: string
+  email: string | null
+}
+
 export type Submission = {
   id: number
   title: string
@@ -29,6 +34,15 @@ export type PaginatedSubmissions = {
   page: number
   page_size: number
   total_pages: number
+}
+
+export type SubmissionPayload = {
+  title: string
+  manuscript_number: string
+  doi_suffix: string
+  abstract: string
+  status: SubmissionStatus
+  authors: AuthorInput[]
 }
 
 export type SubmissionListParams = {
@@ -59,6 +73,56 @@ export async function getSubmissions(
 
   if (!response.ok) {
     throw new Error('Unable to load submissions.')
+  }
+
+  return response.json()
+}
+
+export async function getSubmission(
+  id: number,
+  signal?: AbortSignal,
+): Promise<Submission> {
+  const response = await fetch(`/api/submissions/${id}`, { signal })
+
+  if (!response.ok) {
+    throw new Error('Unable to load submission.')
+  }
+
+  return response.json()
+}
+
+export async function createSubmission(
+  payload: SubmissionPayload,
+): Promise<Submission> {
+  const response = await fetch('/api/submissions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  })
+
+  if (!response.ok) {
+    throw new Error('Unable to save submission.')
+  }
+
+  return response.json()
+}
+
+export async function updateSubmission(
+  id: number,
+  payload: SubmissionPayload,
+): Promise<Submission> {
+  const response = await fetch(`/api/submissions/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  })
+
+  if (!response.ok) {
+    throw new Error('Unable to save submission.')
   }
 
   return response.json()
